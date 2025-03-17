@@ -1,0 +1,50 @@
+.filter_box{
+	width: fit-content;
+	justify-content: center;
+	align-items: center;
+}
+
+.filter_element {margin: 0px 5px;}
+
+.filter_input {
+	width: 120px;
+	height: 25px;
+}
+
+.list_row{
+	width: 100%;
+	border-bottom: 1px solid gray;
+}
+
+.list_element {margin: 10px 0;}
+
+.list_col1 {width: 13.5%;}
+
+.list_col2 {
+	width: 42.5%;
+	min-width: 0;
+	align-items: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.list_col3, .list_col4 {width: 10%;}
+
+.list_col5, .list_col6 {width: 12%;}
+
+.board_title {
+	align-items: center;
+}
+
+.page {
+	text-align: center;
+	width: 30px;
+	margin: 10px 0;
+	cursor: pointer;
+}
+
+.currentPage{
+	color: pink;
+	cursor: auto;
+}
