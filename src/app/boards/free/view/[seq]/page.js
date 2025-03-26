@@ -9,21 +9,57 @@ import { useEffect, useRef, useState } from 'react';
 import css from './page.module.css';
 
 export default function FreeBoardViewPage() {
+	const replyContent = useRef();
 	const router = useRouter();
 	const {seq} = useParams();
 	const [board, setBoard] = useState({});
+	const [attachs, setAttachs] = useState([]);
+	const [replys, setReplys] = useState([]);
 
 	useEffect(() => {
 		const fnid = setTimeout(async () => {
 			const newBoard = await getBoard(seq, true);
 			setBoard(newBoard);
+			setReplys(await getReplyList(seq))
+
+			if (newBoard?.attach) {
+				setAttachs(await getAttachList());
+			}
 		}, 250);
 
 		return () => clearTimeout(fnid);
 	}, []);
 
-	
-	// TODO client component 구현
+	/**
+	 * 페이지 이동 핸들러
+	 * @param {string} path 이동시킬 페이지 경로
+	 */
+	function directingHandler(path) {
+		router.push(path);
+	}
+
+	/**
+	 * 새 댓글 추가 이벤트 핸들러
+	 * @param {import('react').FormEvent} e event
+	 */
+	function replyInsertHandler(e) {
+		e.preventDefault();
+
+		const newReply = {
+			boardNo: board.boardNo,
+			[replyContent.current.name]: replyContent.current.value
+		};
+
+		axios.post(ApiPath.newReply, newReply)
+		.then((res) => {
+			setReplys(res.data);
+			replyContent.current.value = '';
+		}).catch((err) => {
+			console.log(err);
+			alert("댓글 등록에 실패했습니다");
+		});
+	}
+
 	return(
 		<>
 			<h2>게시판 - 보기</h2>
@@ -39,21 +75,30 @@ export default function FreeBoardViewPage() {
 			</section>
 			<hr style={{border: "1px solid black"}} />
 			<br />
-			<section className={'flex'} style={{minHeight: "150px", padding: "0 15px", fontSize: "smaller"}}>
-				<p style={{margin: 0}}>{board.content}</p>
+			<section className={'flex'} style={{flexDirection: 'column', padding: "0 15px"}}>
+				<p style={{minHeight: "150px", margin: 0, fontSize: "smaller"}}>{board.content}</p>
+				<article>
+					{attachs?.length && attachs.map((a) => (
+						"💾" + (<a key={"attachNo" + a.attachNo} onClick={() => downloadhander()}>{a.fileName}</a>)
+					)) || ''}
+				</article>
+			</section>
+			<section>
 			</section>
 			<br />
 			<br />
 			<section style={{padding: "10px 15px", backgroundColor: "whitesmoke"}}>
-				<article>{/* 복제 대상 */}
-					<p className={`${css.chat}`}>1234.12.34 12:34</p>
-					<p className={`${css.chat}`}>이거슨 댓글</p>
+				<article>
+					{replys?.length && replys.map((r) => (<>
+						<p key={"reply_" + r.created} className={`${css.chat}`}>{r.created}</p>
+						<p key={"reply_" + r.created + "_content"} className={`${css.chat}`}>{r.content}</p>
+						<hr />
+					</>)) || ''}
 				</article>
-				<hr />
-				{/* TODO 댓글 구현 필요 */}
-				<form method="post" action="???" className={'flex'} style={{margin: 0, justifyContent: "space-between", marginTop: "5px"}}>
-					<textarea name="" placeholder="댓글을 입력해 주세요." style={{width: "91%", resize: "none"}}></textarea>
-					<button type="button" className={'pointer'} style={{width: "8%", height: "50px"}}>등록</button>
+
+				<form className={'flex'} onSubmit={(e) => replyInsertHandler(e)} style={{margin: 0, justifyContent: "space-between", marginTop: "5px"}}>
+					<textarea ref={replyContent} name='content' placeholder="댓글을 입력해 주세요." required style={{width: "91%", resize: "none"}}></textarea>
+					<button type="submit" className={'pointer'} style={{width: "8%", height: "50px"}}>등록</button>
 				</form>
 			</section>
 			<hr />
