@@ -1,10 +1,12 @@
 "use client";
 
-import UrlVO from '@/app/model/UrlVO';
+import PagePath from '@/shared/model/PagePath';
+import { useRouter } from 'next/navigation';
 import css from './page.module.css';
-import { redirect } from 'next/navigation';
 
-export default function FreeBoardModifyPage(params) {
+export default function FreeBoardModifyPage() {
+	const router = useRouter();
+
 	return(
 		<>
 			<h2>게시판 - 수정</h2>
@@ -99,7 +101,7 @@ export default function FreeBoardModifyPage(params) {
 			<br />
 			<br />
 			<section id="btns" className="flex" style={{justifyContent: "space-between"}}>
-				<button type="button" className={`${css.btn}`} form="form" onClick={() => redirect(UrlVO.list)}>취소</button>
+				<button type="button" className={`${css.btn}`} form="form" onClick={() => router.push(PagePath.list)}>취소</button>
 				<button type="submit" className={`${css.btn}`} form="form" style={{backgroundColor: "forestgreen", color: "white"}}>저장</button>
 			</section>
 		</>

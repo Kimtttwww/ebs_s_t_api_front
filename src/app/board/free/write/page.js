@@ -1,22 +1,20 @@
 "use client";
 
-import UrlVO from '@/app/model/UrlVO';
+import { getCategoryList } from '@/shared/api/APIGetPack';
+import ApiPath from '@/shared/model/ApiPath';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import css from './page.module.css';
 
-export default function FreeBoardWritePage(props) {
+export default function FreeBoardWritePage() {
 	const inputs = useRef({});
 	const router = useRouter();
 	const [category, setCategory] = useState([]);
 
 	useEffect(() => {
 		const fnid = setTimeout(async () => {
-			const data = await axios.get(UrlVO.host + '/boards/free/category')
-				.then((res) => res.data)
-				.catch(() => null);
-			setCategory(data);
+			setCategory(await getCategoryList());
 		}, 250);
 		
 		return () => clearTimeout(fnid);
@@ -66,7 +64,7 @@ export default function FreeBoardWritePage(props) {
 
 		// TODO 게시글 내용 중 crlf 처리 필요
 		// TODO 게시글 등록 처리 필요
-		axios.post(UrlVO.host + UrlVO.write, inputs.current)
+		axios.post(ApiPath.write, inputs.current)
 		.then()
 		.catch()
 	}
@@ -87,7 +85,7 @@ export default function FreeBoardWritePage(props) {
 					<article className={`flex ${css.form_value_col}`}>
 						<select name="categoryNo" className={`${css.form_value}`} required defaultValue={''}>
 							<option value={''} disabled>카테고리 선택</option>
-							{category && category.length && category.map((c) => (
+							{category?.length && category.map((c) => (
 								<option key={'category' + c.categoryNo} value={c.categoryNo}>{c.name}</option>
 							))}
 						</select>

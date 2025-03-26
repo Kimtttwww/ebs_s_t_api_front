@@ -1,21 +1,22 @@
 "use client";
 
-import UrlVO from '@/app/model/UrlVO';
-import css from './page.module.css';
-import { useEffect, useState } from 'react';
+import { getAttachList, getBoard, getReplyList } from '@/shared/api/APIGetPack';
+import ApiPath from '@/shared/model/ApiPath';
+import PagePath from '@/shared/model/PagePath';
 import axios from 'axios';
-import { redirect, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import css from './page.module.css';
 
-export default function FreeBoardViewPage(props) {
+export default function FreeBoardViewPage() {
+	const router = useRouter();
 	const {seq} = useParams();
 	const [board, setBoard] = useState({});
 
 	useEffect(() => {
-		const fnid = setTimeout(() => {
-			axios.get(UrlVO.host + UrlVO.view + seq + '?add=true')
-			.then((res) => {
-				setBoard(res.data);
-			});
+		const fnid = setTimeout(async () => {
+			const newBoard = await getBoard(seq, true);
+			setBoard(newBoard);
 		}, 250);
 
 		return () => clearTimeout(fnid);
@@ -57,8 +58,8 @@ export default function FreeBoardViewPage(props) {
 			</section>
 			<hr />
 			<section className={'flex'} style={{justifyContent: "center"}}>
-				<button className={`${css.btn}`} onClick={() => redirect(UrlVO.list)} style={{backgroundColor: "black", color: "white"}}>목록</button>
-				<button className={`${css.btn}`} onClick={() => redirect(UrlVO.modify + board.boardNo)}>수정</button>
+				<button className={`${css.btn}`} onClick={() => directingHandler(PagePath.list)} style={{backgroundColor: "black", color: "white"}}>목록</button>
+				<button className={`${css.btn}`} onClick={() => directingHandler(PagePath.modify + board.boardNo)}>수정</button>
 				<button className={`${css.btn}`}>삭제</button>
 			</section>
 		</>

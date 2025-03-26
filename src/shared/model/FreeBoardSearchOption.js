@@ -1,3 +1,7 @@
+/**
+ * 
+ * @deprecated redux로 대체할 예정
+ */
 export default class FreeBoardSearchOption {
 	#startDate = null;
 	#endDate = null;
