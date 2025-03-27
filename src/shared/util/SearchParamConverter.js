@@ -1,4 +1,4 @@
-import FreeBoardSearchOption from "./model/FreeBoardSearchOption";
+import FreeBoardSearchOption from "../model/FreeBoardSearchOption";
 
 /**
  * redux에 저장된 fbso을 URLSearchParams.toString() 로 바꿈

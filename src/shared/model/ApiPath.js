@@ -10,4 +10,5 @@ export default class ApiPath {
 	static attachList = this.host + "/board/attach?boardNo="
 	static replyList = this.host + "/board/reply?boardNo="
 	static newReply = this.host + "/board/reply?boardNo="
+	static downloadAttach = this.host + "board/download/"
 }

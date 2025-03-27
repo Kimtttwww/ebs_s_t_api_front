@@ -1,9 +1,9 @@
 // "use server";
 
 import ApiPath from "@/shared/model/ApiPath";
-import FreeBoardSearchOption from "@/shared/model/FreeBoardSearchOption";
-import SearchParamConverter from "@/shared/SearchParamConverter";
 import axios from "axios";
+import FreeBoardSearchOption from "../model/FreeBoardSearchOption";
+import SearchParamConverter from "../util/SearchParamConverter";
 
 /**
  * 게시글 목록 가져오기
@@ -42,7 +42,11 @@ export function getAttachList(boardNo) {
 }
 
 export function getReplyList(boardNo) {
-	return getRequest(ApiPath.attachList + boardNo);
+	return getRequest(ApiPath.replyList + boardNo);
+}
+
+export function getAttachFile(boardNo, attachNo) {
+	return getRequest(ApiPath.downloadAttach + boardNo + '/' + attachNo);
 }
 
 

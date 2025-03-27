@@ -109,7 +109,7 @@ export default class FreeBoardSearchOption {
 	}
 	setCurrentPage(currentPage) {
 		this.#currentPage = parseInt(currentPage);
-		if (this.#currentPage < 1) { this.#currentPage = 1; }
+		if (this.#currentPage < 1) this.#currentPage = 1;
 		this.updateStartEndPage();
 	}
 }
