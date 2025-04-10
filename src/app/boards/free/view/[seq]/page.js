@@ -1,12 +1,14 @@
 "use client";
 
-import { getAttachFile, getAttachList, getBoard, getReplyList } from '@/shared/api/APIGetPack';
-import ApiPath from '@/shared/model/ApiPath';
-import PagePath from '@/shared/model/PagePath';
-import { XSSConverter } from '@/shared/util/TextConverter';
+import FreeBoardAPI from '@/entites/board/api/FreeBoardAPI';
+import FreeBoardPath from '@/entites/board/api/FreeBoardPath';
+import { getAttachList, getBoard, getReplyList } from '@/features/board/api/FreeBoardGetAPI';
+import { XSSConverter } from '@/shared/lib/TextConverter';
+import AttachInfoDiv from '@/widgets/board/AttachInfoDiv';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from 'react-bootstrap';
 import css from './page.module.css';
 
 export default function FreeBoardViewPage() {
@@ -17,19 +19,17 @@ export default function FreeBoardViewPage() {
 	const [attachs, setAttachs] = useState([]);
 	const [replys, setReplys] = useState([]);
 
-	useEffect(() => {
-		const fnid = setTimeout(async () => {
-			const newBoard = await getBoard(seq, true);
-			setBoard(newBoard);
-			setReplys(await getReplyList(seq))
+	useEffect(() => { (async () => {
+		const newBoard = await getBoard(seq, true);
+		setBoard(newBoard);
 
-			if (newBoard?.attach) {
-				setAttachs(await getAttachList(seq));
-			}
-		}, 250);
+		const requests = [getReplyList];
+		if (newBoard?.attach) requests.push(getAttachList);
 
-		return () => clearTimeout(fnid);
-	}, []);
+		const [newReplys, newAttachs] = await Promise.all(requests.map((req) => req(newBoard.boardNo)));
+		setAttachs(newAttachs);
+		setReplys(newReplys)
+	})()}, []);
 
 	/**
 	 * 새 댓글 추가 이벤트 핸들러
@@ -43,10 +43,11 @@ export default function FreeBoardViewPage() {
 			[replyContent.current.name]: XSSConverter(replyContent.current.value)
 		};
 
-		axios.post(ApiPath.newReply, newReply)
+		axios.post(FreeBoardAPI.NEW_REPLY, newReply)
 		.then((res) => {
 			setReplys(res.data);
 			replyContent.current.value = '';
+			alert("댓글이 등록되었습니다. ");
 		}).catch((err) => {
 			console.log(err);
 			alert("댓글 등록에 실패했습니다");
@@ -70,13 +71,9 @@ export default function FreeBoardViewPage() {
 		<section className={'flex'} style={{flexDirection: 'column', padding: "0 15px"}}>
 			<p style={{minHeight: "150px", margin: 0, fontSize: "smaller"}}>{board.content}</p>
 			<article className='flex' style={{flexDirection: 'column'}}>
-				{attachs?.length && attachs.map((a) => (<>
-					{/* TODO 검증 필요 */}
-					<a key={"attachNo" + a.attachNo} onClick={() => getAttachFile(a.boardNo, a.attachNo)}>💾 {a.fileName}</a>
-				</>)) || ''}
+				{/* TODO 검증 필요 */}
+				{attachs?.length && attachs.map((a) => <AttachInfoDiv a={a} />) || ''}
 			</article>
-		</section>
-		<section>
 		</section>
 		<br />
 		<br />
@@ -91,14 +88,14 @@ export default function FreeBoardViewPage() {
 
 			<form className={'flex'} onSubmit={(e) => replyInsertHandler(e)} style={{margin: 0, justifyContent: "space-between", marginTop: "5px"}}>
 				<textarea ref={replyContent} name='content' placeholder="댓글을 입력해 주세요." required style={{width: "91%", resize: "none"}}></textarea>
-				<button type="submit" className={'pointer'} style={{width: "8%", height: "50px"}}>등록</button>
+				<button type="submit" style={{width: "8%", height: "50px"}}>등록</button>
 			</form>
 		</section>
 		<hr />
 		<section className={'flex'} style={{justifyContent: "center"}}>
-			<button className={`${css.btn}`} onClick={() => router.push(PagePath.list)} style={{backgroundColor: "black", color: "white"}}>목록</button>
-			<button className={`${css.btn}`} onClick={() => router.push(PagePath.modify + board.boardNo)}>수정</button>
-			<button className={`${css.btn}`}>삭제</button>
+			<Button variant='info' className={`${css.btn}`} onClick={() => router.push(FreeBoardPath.list)} style={{backgroundColor: "black", color: "white"}}>목록</Button>
+			<Button variant='success' className={`${css.btn}`} onClick={() => router.push(FreeBoardPath.modify + board.boardNo)}>수정</Button>
+			<Button variant='danger' className={`${css.btn}`}>삭제</Button>
 		</section>
 	</>);
 }

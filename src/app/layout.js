@@ -3,6 +3,7 @@
 import store from "@/entites/redux/store";
 import { Provider } from "react-redux";
 import "./globals.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function RootLayout({ children }) {
   return (

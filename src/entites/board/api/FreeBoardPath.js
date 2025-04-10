@@ -1,4 +1,4 @@
-export default class PagePath {
+export default class FreeBoardPath {
 	static list = "/boards/free/list";
 	static view = "/boards/free/view/";
 	static write = "/board/free/write";

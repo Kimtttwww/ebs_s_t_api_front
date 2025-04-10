@@ -22,5 +22,5 @@ export function TagToCRLFConverter(string) {
  * @returns 변환된 문자열
  */
 export function XSSConverter(string) {
-	return string.replace('<', '&lt;').replace('>', '&gt;').trim();
+	return string?.replace('<', '&lt;').replace('>', '&gt;').trim();
 }
